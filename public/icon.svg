@@ -1,0 +1,32 @@
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="14" fill="#09090B" />
+  <defs>
+    <linearGradient id="slTopGold" x1="12" y1="6" x2="52" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#FEF08A" />
+      <stop offset="50%" stopColor="#FBBF24" />
+      <stop offset="100%" stopColor="#F59E0B" />
+    </linearGradient>
+    <linearGradient id="slRightAmber" x1="32" y1="18" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#F59E0B" />
+      <stop offset="100%" stopColor="#B45309" />
+    </linearGradient>
+    <linearGradient id="slLeftSteel" x1="8" y1="18" x2="32" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#E4E4E7" />
+      <stop offset="100%" stopColor="#71717A" />
+    </linearGradient>
+  </defs>
+  <path
+    d="M32 6L54 18.6V45.4L32 58L10 45.4V18.6L32 6Z"
+    stroke="url(#slTopGold)"
+    strokeWidth="2.2"
+    fill="#09090B"
+  />
+  <path d="M32 11L49 20.8L32 30.6L15 20.8L32 11Z" fill="url(#slTopGold)" />
+  <path d="M32 16L42 21.8L32 27.5L22 21.8L32 16Z" fill="#09090B" />
+  <path d="M32 19L37 21.9L32 24.8L27 21.9L32 19Z" fill="#FBBF24" />
+  <path d="M15 20.8L32 30.6V50.2L15 40.4V20.8Z" fill="url(#slLeftSteel)" />
+  <path d="M19 27.5L28 32.8M19 32.8L28 38.1M19 38.1L28 43.4" stroke="#09090B" strokeWidth="2" strokeLinecap="round" />
+  <path d="M49 20.8L32 30.6V50.2L49 40.4V20.8Z" fill="url(#slRightAmber)" />
+  <path d="M45 27.5L36 32.8M45 32.8L36 38.1M45 38.1L36 43.4" stroke="#09090B" strokeWidth="2" strokeLinecap="round" />
+  <path d="M28.5 52L32 55.8L35.5 52H28.5Z" fill="#FBBF24" />
+</svg>

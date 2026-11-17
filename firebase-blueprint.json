@@ -1,0 +1,313 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A 3D printed product listed in the StarkLaBs store catalog.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Arabic product name",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "category": {
+          "type": "string",
+          "description": "Product category in Arabic",
+          "enum": ["مجسمات وخوذ", "إضاءة وديكور", "إكسسوارات مكتبية", "قطع هندسية مخصصة"],
+          "minLength": 2,
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "description": "Concise product details and specifications",
+          "minLength": 5,
+          "maxLength": 1000
+        },
+        "price": {
+          "type": "number",
+          "description": "Original price in EGP"
+        },
+        "discountPercent": {
+          "type": "number",
+          "description": "Discount percentage from 0 to 90"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Primary product image URL or path",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "postUrl": {
+          "type": "string",
+          "description": "Optional Facebook or Instagram video/post link on StarkLaBs page",
+          "minLength": 0,
+          "maxLength": 500
+        },
+        "material": {
+          "type": "string",
+          "description": "3D printing filament material type (e.g. PLA+ Silk, PETG Carbon)",
+          "minLength": 2,
+          "maxLength": 60
+        },
+        "printTimeHours": {
+          "type": "number",
+          "description": "Estimated 3D print duration in hours"
+        },
+        "dimensions": {
+          "type": "string",
+          "description": "Product dimensions in cm or mm",
+          "minLength": 2,
+          "maxLength": 60
+        },
+        "colors": {
+          "type": "array",
+          "description": "Available filament colors (bounded up to 8 colors)"
+        },
+        "inStock": {
+          "type": "boolean",
+          "description": "Whether the product is available to order"
+        },
+        "featured": {
+          "type": "boolean",
+          "description": "Whether the product is highlighted in the featured collection"
+        },
+        "authorId": {
+          "type": "string",
+          "description": "UID of the admin who created the product",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp"
+        }
+      },
+      "required": [
+        "title",
+        "category",
+        "description",
+        "price",
+        "discountPercent",
+        "imageUrl",
+        "postUrl",
+        "material",
+        "printTimeHours",
+        "dimensions",
+        "colors",
+        "inStock",
+        "featured",
+        "authorId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A customer order for 3D printed items with isolated PII access.",
+      "type": "object",
+      "properties": {
+        "orderNumber": {
+          "type": "string",
+          "description": "Human-readable order code e.g. SL-1042",
+          "minLength": 3,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "customerId": {
+          "type": "string",
+          "description": "UID of the customer who placed the order",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "customerName": {
+          "type": "string",
+          "description": "Full name of the customer",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "customerEmail": {
+          "type": "string",
+          "format": "email",
+          "description": "Customer email address for order confirmation",
+          "minLength": 5,
+          "maxLength": 150
+        },
+        "customerPhone": {
+          "type": "string",
+          "description": "Customer phone/WhatsApp number",
+          "minLength": 8,
+          "maxLength": 25
+        },
+        "shippingAddress": {
+          "type": "string",
+          "description": "Detailed shipping address in Egypt",
+          "minLength": 5,
+          "maxLength": 300
+        },
+        "itemsSummary": {
+          "type": "string",
+          "description": "Formatted summary of ordered items, quantities, and selected filament colors",
+          "minLength": 3,
+          "maxLength": 1500
+        },
+        "itemsCount": {
+          "type": "number",
+          "description": "Total number of items in the order"
+        },
+        "subtotal": {
+          "type": "number",
+          "description": "Order subtotal before discount"
+        },
+        "discountTotal": {
+          "type": "number",
+          "description": "Total discount amount applied"
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Final order amount in EGP"
+        },
+        "status": {
+          "type": "string",
+          "description": "Order lifecycle status",
+          "enum": ["قيد المراجعة", "جاري الطباعة 3D", "تم الشحن", "مكتمل", "ملغي"],
+          "minLength": 2,
+          "maxLength": 40
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional customer customization notes",
+          "minLength": 0,
+          "maxLength": 500
+        },
+        "emailSent": {
+          "type": "boolean",
+          "description": "Whether confirmation email was sent via Gmail"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp"
+        }
+      },
+      "required": [
+        "orderNumber",
+        "customerId",
+        "customerName",
+        "customerEmail",
+        "customerPhone",
+        "shippingAddress",
+        "itemsSummary",
+        "itemsCount",
+        "subtotal",
+        "discountTotal",
+        "totalAmount",
+        "status",
+        "notes",
+        "emailSent",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "A customer star rating and review for a 3D printed product (no PII stored).",
+      "type": "object",
+      "properties": {
+        "productId": {
+          "type": "string",
+          "description": "ID of the reviewed product",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the reviewer",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "reviewerName": {
+          "type": "string",
+          "description": "Public display name of the reviewer",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "rating": {
+          "type": "number",
+          "description": "Star rating from 1 to 5"
+        },
+        "comment": {
+          "type": "string",
+          "description": "Review comment in Arabic",
+          "minLength": 2,
+          "maxLength": 500
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "Whether the review comment is publicly visible on the storefront (controllable by admin)"
+        },
+        "orderId": {
+          "type": "string",
+          "description": "ID or orderNumber of the verified purchase order from Cart History",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp"
+        }
+      },
+      "required": [
+        "productId",
+        "userId",
+        "reviewerName",
+        "rating",
+        "comment",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": {
+        "$ref": "#/entities/Product"
+      },
+      "description": "Publicly readable catalog of 3D printed products; writable only by verified store admin."
+    },
+    "/orders/{orderId}": {
+      "schema": {
+        "$ref": "#/entities/Order"
+      },
+      "description": "Customer orders containing PII; readable only by the order owner (customerId) or the verified store admin."
+    },
+    "/reviews/{reviewId}": {
+      "schema": {
+        "$ref": "#/entities/Review"
+      },
+      "description": "Publicly readable product star ratings and reviews (no PII); writable by verified authenticated users for their own userId or by store admin."
+    }
+  }
+}

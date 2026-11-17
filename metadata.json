@@ -1,0 +1,6 @@
+{
+  "name": "StarkLaBs — متجر الطباعة ثلاثية الأبعاد",
+  "description": "متجر StarkLaBs لمنتجات الطباعة ثلاثية الأبعاد المخصصة، المجسمات الهندسية، والإضاءة العصرية مع لوحة تحكم ذكية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

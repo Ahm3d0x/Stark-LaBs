@@ -1,0 +1,227 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 4.1: Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Phase 3: Reusable Hardened Global Helpers
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isBootstrappedAdmin() {
+      return isVerifiedUser() && request.auth.token.email == 'ah2005211@gmail.com';
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin() || (isVerifiedUser() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isOwner(userId) {
+      return isVerifiedUser() && request.auth.uid == userId;
+    }
+
+    // Pillar 2: Validation Blueprint for Product
+    function isValidProduct(data) {
+      return data.keys().hasAll([
+        'title', 'category', 'description', 'price', 'discountPercent',
+        'imageUrl', 'postUrl', 'material', 'printTimeHours', 'dimensions',
+        'colors', 'inStock', 'featured', 'authorId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'title', 'category', 'description', 'price', 'discountPercent',
+        'imageUrl', 'postUrl', 'material', 'printTimeHours', 'dimensions',
+        'colors', 'inStock', 'featured', 'authorId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.title is string && data.title.size() >= 2 && data.title.size() <= 120 &&
+      data.category is string && data.category.size() >= 2 && data.category.size() <= 50 &&
+      data.category in ['مجسمات وخوذ', 'إضاءة وديكور', 'إكسسوارات مكتبية', 'قطع هندسية مخصصة'] &&
+      data.description is string && data.description.size() >= 5 && data.description.size() <= 1000 &&
+      data.price is number && data.price >= 0 && data.price <= 1000000 &&
+      data.discountPercent is number && data.discountPercent >= 0 && data.discountPercent <= 90 &&
+      data.imageUrl is string && data.imageUrl.size() >= 1 && data.imageUrl.size() <= 500 &&
+      data.postUrl is string && data.postUrl.size() >= 0 && data.postUrl.size() <= 500 &&
+      data.material is string && data.material.size() >= 2 && data.material.size() <= 60 &&
+      data.printTimeHours is number && data.printTimeHours >= 0.5 && data.printTimeHours <= 500 &&
+      data.dimensions is string && data.dimensions.size() >= 2 && data.dimensions.size() <= 60 &&
+      data.colors is list && data.colors.size() >= 1 && data.colors.size() <= 8 &&
+      data.colors[0] is string && data.colors[0].size() >= 1 && data.colors[0].size() <= 40 &&
+      data.inStock is bool &&
+      data.featured is bool &&
+      data.authorId is string && data.authorId.size() >= 1 && data.authorId.size() <= 128 &&
+      data.authorId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // Pillar 2: Validation Blueprint for Order
+    function isValidOrder(data) {
+      return data.keys().hasAll([
+        'orderNumber', 'customerId', 'customerName', 'customerEmail',
+        'customerPhone', 'shippingAddress', 'itemsSummary', 'itemsCount',
+        'subtotal', 'discountTotal', 'totalAmount', 'status', 'notes',
+        'emailSent', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'orderNumber', 'customerId', 'customerName', 'customerEmail',
+        'customerPhone', 'shippingAddress', 'itemsSummary', 'itemsCount',
+        'subtotal', 'discountTotal', 'totalAmount', 'status', 'notes',
+        'emailSent', 'createdAt', 'updatedAt'
+      ]) &&
+      data.orderNumber is string && data.orderNumber.size() >= 3 && data.orderNumber.size() <= 32 &&
+      data.orderNumber.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.customerId is string && data.customerId.size() >= 1 && data.customerId.size() <= 128 &&
+      data.customerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.customerName is string && data.customerName.size() >= 2 && data.customerName.size() <= 100 &&
+      data.customerEmail is string && data.customerEmail.size() >= 5 && data.customerEmail.size() <= 150 &&
+      data.customerPhone is string && data.customerPhone.size() >= 8 && data.customerPhone.size() <= 25 &&
+      data.shippingAddress is string && data.shippingAddress.size() >= 5 && data.shippingAddress.size() <= 300 &&
+      data.itemsSummary is string && data.itemsSummary.size() >= 3 && data.itemsSummary.size() <= 1500 &&
+      data.itemsCount is number && data.itemsCount >= 1 && data.itemsCount <= 100 &&
+      data.subtotal is number && data.subtotal >= 0 && data.subtotal <= 10000000 &&
+      data.discountTotal is number && data.discountTotal >= 0 && data.discountTotal <= 10000000 &&
+      data.totalAmount is number && data.totalAmount >= 0 && data.totalAmount <= 10000000 &&
+      data.status is string && data.status.size() >= 2 && data.status.size() <= 40 &&
+      data.status in ['قيد المراجعة', 'جاري الطباعة 3D', 'تم الشحن', 'مكتمل', 'ملغي'] &&
+      data.notes is string && data.notes.size() >= 0 && data.notes.size() <= 500 &&
+      data.emailSent is bool &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // Pillar 2: Validation Blueprint for Review (No PII stored)
+    function isValidReview(data) {
+      return data.keys().hasAll([
+        'productId', 'userId', 'reviewerName', 'rating', 'comment', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'productId', 'userId', 'reviewerName', 'rating', 'comment', 'visible', 'orderId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.productId is string && data.productId.size() >= 1 && data.productId.size() <= 128 &&
+      data.productId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+      data.userId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.reviewerName is string && data.reviewerName.size() >= 2 && data.reviewerName.size() <= 80 &&
+      data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+      data.comment is string && data.comment.size() >= 2 && data.comment.size() <= 500 &&
+      (!('visible' in data) || data.visible is bool) &&
+      (!('orderId' in data) || (data.orderId is string && data.orderId.size() >= 1 && data.orderId.size() <= 128 && data.orderId.matches('^[a-zA-Z0-9_\\-]+$'))) &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // Admins Registry Collection
+    match /admins/{adminId} {
+      allow get: if isValidId(adminId) && (isOwner(adminId) || isBootstrappedAdmin());
+      allow list: if false;
+      allow create, update, delete: if false;
+    }
+
+    // Products Catalog Collection
+    match /products/{productId} {
+      // Public storefront catalog read access with explicit field constraint
+      allow get: if isValidId(productId);
+      allow list: if resource.data.price >= 0;
+
+      allow create: if isVerifiedUser() &&
+        isValidId(productId) &&
+        isValidProduct(incoming()) &&
+        incoming().authorId == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        isAdmin();
+
+      allow update: if isVerifiedUser() &&
+        isValidId(productId) &&
+        isValidProduct(incoming()) &&
+        incoming().authorId == existing().authorId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        isAdmin() &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'category', 'description', 'price', 'discountPercent',
+          'imageUrl', 'postUrl', 'material', 'printTimeHours', 'dimensions',
+          'colors', 'inStock', 'featured', 'updatedAt'
+        ]);
+
+      allow delete: if isVerifiedUser() && isValidId(productId) && isAdmin();
+    }
+
+    // Orders Collection (PII Isolated to Owner or Admin)
+    match /orders/{orderId} {
+      allow get: if isValidId(orderId) && (isOwner(existing().customerId) || isAdmin());
+      // Pillar 8: Secure List Query without get()/exists() cost explosion
+      allow list: if isVerifiedUser() && (resource.data.customerId == request.auth.uid || isBootstrappedAdmin());
+
+      allow create: if isVerifiedUser() &&
+        isValidId(orderId) &&
+        isValidOrder(incoming()) &&
+        incoming().customerId == request.auth.uid &&
+        incoming().status == 'قيد المراجعة' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isVerifiedUser() &&
+        isValidId(orderId) &&
+        isValidOrder(incoming()) &&
+        incoming().customerId == existing().customerId &&
+        incoming().orderNumber == existing().orderNumber &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          // Action 1: Admin updates order status or emailSent flag (with terminal override)
+          (isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'emailSent', 'notes', 'updatedAt'])) ||
+          // Action 2: Customer cancels or updates emailSent on non-terminal order
+          (isOwner(existing().customerId) &&
+            !(existing().status in ['مكتمل', 'ملغي']) &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['emailSent', 'updatedAt']))
+        );
+
+      allow delete: if isVerifiedUser() && isValidId(orderId) && isAdmin();
+    }
+
+    // Product Reviews Collection (Publicly readable star ratings & comments, no PII)
+    match /reviews/{reviewId} {
+      allow get: if isValidId(reviewId);
+      allow list: if resource.data.rating >= 1 && resource.data.rating <= 5;
+
+      allow create: if isVerifiedUser() &&
+        isValidId(reviewId) &&
+        isValidReview(incoming()) &&
+        incoming().userId == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isVerifiedUser() &&
+        isValidId(reviewId) &&
+        isValidReview(incoming()) &&
+        incoming().userId == existing().userId &&
+        incoming().productId == existing().productId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          isAdmin() ||
+          (isOwner(existing().userId) &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['rating', 'comment', 'reviewerName', 'updatedAt']))
+        );
+
+      allow delete: if isVerifiedUser() && isValidId(reviewId) && (isOwner(existing().userId) || isAdmin());
+    }
+  }
+}
